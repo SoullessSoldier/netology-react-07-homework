@@ -124,7 +124,7 @@ function MonthTable(props) {
     </div>
   );
 };
-
+/* Before refactor
 const YearTableView = (props) => {
   const { list } = props;
   const data = aggregateByYearMonth(list, "byYear");
@@ -142,16 +142,43 @@ const SortTableView = (props) => {
   const data = aggregateByYearMonth(list, "byDate");
   return <SortTable list={data} />;
 };
+*/
+const DateTableAggregated = (Component) => {
+  const WrappedComponent = (props) => {
+    const list = props.list;
+    const mode = props.mode;
+    const data = aggregateByYearMonth(list, mode);
+    return <Component list={data} />;
+  }
+  const componentName = Component.displayName || Component.name || "Component";
+  WrappedComponent.displayName = `DateTableAggregated(${componentName})`;
+  return WrappedComponent;
+}
 
+const MonthTableAggregated = DateTableAggregated(MonthTable);
+const YearTableAggregated = DateTableAggregated(YearTable);
+const SortTableAggregated = DateTableAggregated(SortTable);
+
+/* Before refactor
 const AppView = ({list}) => {
   return (
-      <div id="app">
-        <MonthTableView list={list} />
-        <YearTableView list={list} />
-        <SortTableView list={list} />
-      </div>
-    );
+    <div id="app">
+      <MonthTableView list={list} />
+      <YearTableView list={list} />
+      <SortTableView list={list} />
+    </div>
+  );
 }
+*/
+const AppView = ({ list }) => {
+  return (
+    <div id="app">
+      <MonthTableAggregated list={list} mode="byMonth" />
+      <YearTableAggregated list={list} mode="byYear" />
+      <SortTableAggregated list={list} mode="byDate" />
+    </div>
+  );
+};
 
 const AppLoader = () => {
   const data = useData({mapData: sortData, url: backendUrl, defaultData: []});
